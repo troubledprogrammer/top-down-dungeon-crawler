@@ -9,7 +9,7 @@ class Player(pg.sprite.Sprite):
         super().__init__()
         self.image = pg.Surface(PLAYER_SIZE)
         self.image.fill("green")
-        self.rect = self.image.get_rect(topleft=pos)
+        self.rect = self.image.get_rect(center=pos)
 
         self.velocity = pg.Vector2()
         self.lock_x = self.lock_y = False
@@ -17,19 +17,17 @@ class Player(pg.sprite.Sprite):
     def _update_input(self, dt):
         keys = pg.key.get_pressed()
 
+        self.velocity.x = 0
         if keys[pg.K_a]:
-            self.velocity.x = -PLAYER_SPEED * dt
-        elif keys[pg.K_d]:
-            self.velocity.x = PLAYER_SPEED * dt
-        else:
-            self.velocity.x = 0
+            self.velocity.x += -PLAYER_SPEED * dt
+        if keys[pg.K_d]:
+            self.velocity.x += PLAYER_SPEED * dt
 
+        self.velocity.y = 0
         if keys[pg.K_w]:
-            self.velocity.y = -PLAYER_SPEED * dt
-        elif keys[pg.K_s]:
-            self.velocity.y = PLAYER_SPEED * dt
-        else:
-            self.velocity.y = 0
+            self.velocity.y += -PLAYER_SPEED * dt
+        if keys[pg.K_s]:
+            self.velocity.y += PLAYER_SPEED * dt
 
     def update_movement_x(self):
         if not self.lock_x:

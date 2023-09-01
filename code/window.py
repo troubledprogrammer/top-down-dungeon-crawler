@@ -51,7 +51,7 @@ class Window:
         if self._showfps:
             self._draw_fps()
         pg.display.update()
-        self.display.fill("black")
+        self.display.fill("#222222")
 
         self.deltatime = self._clock.tick(240)
         try:
