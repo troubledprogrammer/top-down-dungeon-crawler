@@ -1,15 +1,18 @@
 import pygame as pg
 from typing import Tuple
 
-from code.settings import PLAYER_SIZE, PLAYER_SPEED
+from code.settings import PLAYER_SIZE, PLAYER_SPEED, DEBUG
 
 
 class Player(pg.sprite.Sprite):
     def __init__(self, pos: Tuple[int, int] | pg.Vector2):
         super().__init__()
-        self.image = pg.Surface(PLAYER_SIZE)
-        self.image.fill("green")
+        self.image = pg.image.load("assets/characters/angel/angel_idle_anim_f0.png")
+        self.image = pg.transform.scale(self.image, PLAYER_SIZE)
         self.rect = self.image.get_rect(center=pos)
+
+        if DEBUG:
+            pg.draw.rect(self.image, "red", pg.Rect(0, 0, *self.rect.size), 1)
 
         self.velocity = pg.Vector2()
         self.lock_x = self.lock_y = False

@@ -78,7 +78,6 @@ class Level:
         self.world_shift.x, self.world_shift.y = window_center_x - player_x, window_center_y - player_y
         player.rect.center = window_center_x, window_center_y
 
-
     def _scroll(self, dt):
         player = self.player.sprite
 
@@ -111,20 +110,22 @@ class Level:
         player.update_movement_x()
         collided_sprite = pg.sprite.spritecollideany(player, self.walls_collidable)
         if collided_sprite is not None:
-            if player.velocity.x < 0:
-                player.rect.left = collided_sprite.rect.right
-            elif player.velocity.x > 0:
-                player.rect.right = collided_sprite.rect.left
+            # if player.velocity.x < 0:
+            #     player.rect.left = collided_sprite.rect.right
+            # elif player.velocity.x > 0:
+            #     player.rect.right = collided_sprite.rect.left
+            player.rect.x -= player.velocity.x
 
     def _do_vertical_collisions(self):
         player = self.player.sprite
         player.update_movement_y()
         collided_sprite = pg.sprite.spritecollideany(player, self.walls_collidable)
         if collided_sprite is not None:
-            if player.velocity.y < 0:
-                player.rect.top = collided_sprite.rect.bottom
-            elif player.velocity.y > 0:
-                player.rect.bottom = collided_sprite.rect.top
+            # if player.velocity.y < 0:
+            #     player.rect.top = collided_sprite.rect.bottom
+            # elif player.velocity.y > 0:
+            #     player.rect.bottom = collided_sprite.rect.top
+            player.rect.y -= player.velocity.y
 
     def _update_sprites(self):
         self.floor.update(self.world_shift)
