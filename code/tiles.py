@@ -1,7 +1,7 @@
 import pygame as pg
 from typing import Tuple
 
-from code.settings import TILE_SIZE, TILE_X, TILE_Y
+from code.settings import TILE_X, TILE_Y, DEBUG
 from code.tiletypes import *
 
 
@@ -14,6 +14,9 @@ class Tile(pg.sprite.Sprite):
         self.pos_on_map = pg.Vector2(pos)
 
         self.tile_info = tile_info
+
+        if DEBUG and self.tile_info.collidable:
+            pg.draw.rect(self.image, "blue", pg.Rect(0, 0, *self.rect.size), 1)
 
     def update(self, shift: pg.Vector2) -> None:
         self.rect.topleft = self.pos_on_map + shift
@@ -54,5 +57,3 @@ class TileFactory:
             return StaticTile(pos, tile_info)
         elif tile_info.tile_type == TileType.Floor:
             return StaticTile(pos, tile_info)
-
-

@@ -1,10 +1,10 @@
 import pygame as pg
 from pathlib import Path
 
-from code.settings import LEVEL_PATH, PLAYER_SPEED, PLAYER_LOCK_X_MIN, PLAYER_LOCK_X_MAX, PLAYER_LOCK_Y_MIN, \
-    PLAYER_LOCK_Y_MAX, WINDOW_X, WINDOW_Y
+from code.settings import LEVEL_PATH, DEBUG, WINDOW_X, WINDOW_Y
 from code.tiles import TileFactory
 from code.entities import EntityType, EntityFactory
+from code.player import Player
 from code.window import Window
 
 
@@ -35,6 +35,7 @@ class Level:
         # shift
         self.world_shift = pg.Vector2()
         self._center_player()
+        self._update_sprites()  # repositions sprites with world shift
 
     def _create_tile_group_from_path(self, layer_type: str):
         collidable = []
@@ -73,59 +74,51 @@ class Level:
 
     def _center_player(self):
         player = self.player.sprite
-        player_x, player_y = player.rect.center
+        player_x, player_y = player.pos
         window_center_x, window_center_y = WINDOW_X // 2, WINDOW_Y // 2
         self.world_shift.x, self.world_shift.y = window_center_x - player_x, window_center_y - player_y
-        player.rect.center = window_center_x, window_center_y
 
-    def _scroll(self, dt):
+    def _run_tile_collisions_x(self, player: Player):
+        collidable_players = self.walls_collidable.sprites()  # + ...
+
+        for s in collidable_players:
+            if s.rect.colliderect(player.collide_rect):
+                # x
+                if player.velocity.x < 0 and s.rect.left <= player.collide_rect.left <= s.rect.right:
+                    player.collide_rect.left = s.rect.right
+                elif player.velocity.x > 0 and s.rect.left <= player.collide_rect.right <= s.rect.right:
+                    player.collide_rect.right = s.rect.left
+                else:
+                    print(f"Player clipped inside {s} ({s.rect=})")
+
+    def _run_tile_collisions_y(self, player: Player):
+        collidable_players = self.walls_collidable.sprites()  # + ...
+
+        for s in collidable_players:
+            if s.rect.colliderect(player.collide_rect):
+                # y
+                if player.velocity.y < 0 and s.rect.top <= player.collide_rect.top <= s.rect.bottom:
+                    player.collide_rect.top = s.rect.bottom
+                elif player.velocity.y > 0 and s.rect.top <= player.collide_rect.bottom <= s.rect.bottom:
+                    player.collide_rect.bottom = s.rect.top
+                else:
+                    print(f"Player clipped inside {s} ({s.rect=})")
+
+    def _move_player_x(self):
         player = self.player.sprite
+        start_x = player.collide_rect.x
+        player.collide_rect.x += player.velocity.x
+        self._run_tile_collisions_x(player)
+        end_x = player.collide_rect.x
+        self.world_shift.x += start_x - end_x
 
-        # x
-        player_x = player.rect.centerx
-        direction_x = player.velocity.x
-        if player_x < PLAYER_LOCK_X_MIN and direction_x < 0:
-            self.world_shift.x += PLAYER_SPEED * dt
-            player.lock_x = True
-        elif player_x > PLAYER_LOCK_X_MAX and direction_x > 0:
-            self.world_shift.x += -PLAYER_SPEED * dt
-            player.lock_x = True
-        else:
-            player.lock_x = False
-
-        # y
-        player_y = player.rect.centery
-        direction_y = player.velocity.y
-        if player_y < PLAYER_LOCK_Y_MIN and direction_y < 0:
-            self.world_shift.y += PLAYER_SPEED * dt
-            player.lock_y = True
-        elif player_y > PLAYER_LOCK_Y_MAX and direction_y > 0:
-            self.world_shift.y += -PLAYER_SPEED * dt
-            player.lock_y = True
-        else:
-            player.lock_y = False
-
-    def _do_horizontal_collisions(self):
+    def _move_player_y(self):
         player = self.player.sprite
-        player.update_movement_x()
-        collided_sprite = pg.sprite.spritecollideany(player, self.walls_collidable)
-        if collided_sprite is not None:
-            # if player.velocity.x < 0:
-            #     player.rect.left = collided_sprite.rect.right
-            # elif player.velocity.x > 0:
-            #     player.rect.right = collided_sprite.rect.left
-            player.rect.x -= player.velocity.x
-
-    def _do_vertical_collisions(self):
-        player = self.player.sprite
-        player.update_movement_y()
-        collided_sprite = pg.sprite.spritecollideany(player, self.walls_collidable)
-        if collided_sprite is not None:
-            # if player.velocity.y < 0:
-            #     player.rect.top = collided_sprite.rect.bottom
-            # elif player.velocity.y > 0:
-            #     player.rect.bottom = collided_sprite.rect.top
-            player.rect.y -= player.velocity.y
+        start_y = player.collide_rect.y
+        player.collide_rect.y += player.velocity.y
+        self._run_tile_collisions_y(player)
+        end_y = player.collide_rect.y
+        self.world_shift.y += start_y - end_y
 
     def _update_sprites(self):
         self.floor.update(self.world_shift)
@@ -134,8 +127,9 @@ class Level:
 
     def _update_player(self):
         self.player.update(self.window.deltatime)
-        self._do_horizontal_collisions()
-        self._do_vertical_collisions()
+        self._move_player_x()
+        self._move_player_y()
+        self.player.sprite.reset_collide_rect_pos()
 
     def _draw(self):
         self.floor.draw(self.window.display)
@@ -143,8 +137,10 @@ class Level:
         self.walls_collidable.draw(self.window.display)
         self.walls_non_collidable.draw(self.window.display)
 
+        if DEBUG:
+            pg.draw.rect(self.window.display, "red", self.player.sprite.collide_rect, 2)
+
     def tick(self):
-        self._update_sprites()
-        self._scroll(self.window.deltatime)
         self._update_player()
+        self._update_sprites()
         self._draw()

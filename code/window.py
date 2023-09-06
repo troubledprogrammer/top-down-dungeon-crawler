@@ -59,7 +59,8 @@ class Window:
         except ZeroDivisionError:
             self.fps = 1000
 
-    def has_quit(self) -> bool:
+    @staticmethod
+    def has_quit() -> bool:
         for e in pg.event.get():
             if e.type == pg.QUIT:
                 pg.quit()
