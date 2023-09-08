@@ -1,6 +1,6 @@
 from enum import Enum
 
-from code.settings import ASSETS_PATH
+from code.settings import ASSETS_PATH_FLOOR, ASSETS_PATH_WALL_BASIC, ASSETS_PATH_WALL_DECO
 
 
 class TileType(Enum):
@@ -11,9 +11,9 @@ class TileType(Enum):
 
 
 TileTexturePaths = {
-    TileType.WallBasic: ASSETS_PATH + "wall/basic/",
-    TileType.WallDeco: ASSETS_PATH + "wall/deco/",
-    TileType.Floor: ASSETS_PATH + "floor/",
+    TileType.WallBasic: ASSETS_PATH_WALL_BASIC,
+    TileType.WallDeco: ASSETS_PATH_WALL_DECO,
+    TileType.Floor: ASSETS_PATH_FLOOR,
 }
 
 
