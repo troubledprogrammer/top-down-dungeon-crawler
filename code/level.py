@@ -126,7 +126,7 @@ class Level:
         self.walls_non_collidable.update(self.world_shift)
 
     def _update_player(self):
-        self.player.update(self.window.deltatime)
+        self.player.update(self.window)
         self._move_player_x()
         self._move_player_y()
         self.player.sprite.reset_collide_rect_pos()

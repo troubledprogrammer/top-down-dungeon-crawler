@@ -32,6 +32,8 @@ class Window:
         self.deltatime = 1
         self.fps = 60
 
+        self.events = []
+
         self._showfps = showfps
         self._debug_font = pg.font.SysFont("consolas.ttf", 48)
 
@@ -59,9 +61,10 @@ class Window:
         except ZeroDivisionError:
             self.fps = 1000
 
-    @staticmethod
-    def has_quit() -> bool:
-        for e in pg.event.get():
+        self.events = pg.event.get()
+
+    def has_quit(self) -> bool:
+        for e in self.events:
             if e.type == pg.QUIT:
                 pg.quit()
                 return True
