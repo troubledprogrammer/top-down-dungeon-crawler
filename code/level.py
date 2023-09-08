@@ -15,6 +15,7 @@ def load_csv(fp):
     return level
 
 
+# noinspection PyTypeChecker
 class Level:
     def __init__(self, level_id: int, window: Window):
         # display

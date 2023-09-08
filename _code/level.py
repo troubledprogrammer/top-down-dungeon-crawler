@@ -32,6 +32,7 @@ class WallTile(Sprite):
         self._draw()
 
 
+# noinspection PyTypeChecker
 class Level:
     tile_size = 50
 
