@@ -6,13 +6,14 @@ import pygame as pg
 
 from code.window import Window
 from code.level import Level
+from code.settings import DEBUG
 
 
 class Game:
     def __init__(self):
         pg.init()
 
-        self.window = Window(showfps=True)
+        self.window = Window(showfps=DEBUG)
 
         self.level = Level(0, self.window)
 

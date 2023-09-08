@@ -6,6 +6,7 @@ from code.tiles import TileFactory
 from code.entities import EntityType, EntityFactory
 from code.player import Player
 from code.window import Window
+from code.UI import UI
 
 
 def load_csv(fp):
@@ -32,10 +33,13 @@ class Level:
         self.player = pg.sprite.GroupSingle()
         self._setup_entities(Path(LEVEL_PATH.format(level_id=0, layer_type="info")))
 
+        # ui
+        self.ui = pg.sprite.GroupSingle(UI(self.player.sprite))
+
         # shift
         self.world_shift = pg.Vector2()
         self._center_player()
-        self._update_sprites()  # repositions sprites with world shift
+        self._update_sprites()  # repositions sprites with world after player has been centered
 
     def _create_tile_group_from_path(self, layer_type: str):
         collidable = []
@@ -136,6 +140,7 @@ class Level:
         self.player.draw(self.window.display)
         self.walls_collidable.draw(self.window.display)
         self.walls_non_collidable.draw(self.window.display)
+        self.ui.draw(self.window.display)
 
         if DEBUG:
             pg.draw.rect(self.window.display, "red", self.player.sprite.collide_rect, 2)
@@ -143,4 +148,5 @@ class Level:
     def tick(self):
         self._update_player()
         self._update_sprites()
+        self.ui.update()
         self._draw()

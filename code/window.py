@@ -26,6 +26,7 @@ class Window:
 
     def __init__(self, width=WINDOW_X, height=WINDOW_Y, showfps=False) -> None:
         self.display = pg.display.set_mode((width, height))
+        pg.display.set_caption("")
 
         self._clock = pg.time.Clock()
 

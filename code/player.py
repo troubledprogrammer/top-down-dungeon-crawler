@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 import pygame as pg
-from typing import Tuple
+from typing import Tuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from code.window import Window
 
 from code.settings import PLAYER_SIZE, PLAYER_SPEED, WINDOW_X, WINDOW_Y, PLAYER_HITBOX_SIZE, PLAYER_HITBOX_OFFSET_X, \
-    PLAYER_HITBOX_OFFSET_Y, DASH_FRICTION, DASH_POWER, DASH_COOLDOWN, ANIMATION_MS_PER_FRAME, ASSETS_PATH_PLAYER
+    PLAYER_HITBOX_OFFSET_Y, DASH_FRICTION, DASH_POWER, DASH_COOLDOWN, ANIMATION_MS_PER_FRAME, ASSETS_PATH_PLAYER, \
+    PLAYER_MAX_HEALTH
 from enum import Enum
 
 
@@ -33,6 +38,9 @@ class Player(pg.sprite.Sprite):
         self.dash_vector = pg.Vector2()
         self.dash_cooldown_ms = 0
         self.pos = pg.Vector2(pos)
+
+        # data
+        self.health = PLAYER_MAX_HEALTH
 
     def _load_textures(self):
         self.textures = {
@@ -108,7 +116,7 @@ class Player(pg.sprite.Sprite):
         self.collide_rect.x = self.rect.x + PLAYER_HITBOX_OFFSET_X
         self.collide_rect.y = self.rect.y + PLAYER_HITBOX_OFFSET_Y
 
-    def update(self, window):
+    def update(self, window: Window):
         self._update_input_key(window.deltatime)
         self._update_input_mouse(window.events)
         self._update_dash_friction(window.deltatime)
