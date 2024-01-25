@@ -49,6 +49,10 @@ class UI(pg.sprite.Sprite):
 
     def _update_health_bar(self):
         ratio = self.player.health / PLAYER_MAX_HEALTH
+        if ratio <= 0: # health is negative
+            print("Health went negative: cannot draw the health bar")
+            self.health_bar_inner = pg.Surface((0,0))
+            return
         self.health_bar_inner = pg.transform.scale(self.health_bar_inner_texture,
                                                    (self.health_bar_inner_width * ratio, HEATH_BAR_INNER_HEIGHT))
 

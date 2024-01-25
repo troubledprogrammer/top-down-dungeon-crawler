@@ -10,6 +10,11 @@ PLAYER_SIZE = PLAYER_X, PLAYER_Y = 40, 40
 PLAYER_HITBOX_SIZE = PLAYER_HITBOX_SIZE_X, PLAYER_HITBOX_SIZE_Y = 20, 25
 PLAYER_HITBOX_OFFSET = PLAYER_HITBOX_OFFSET_X, PLAYER_HITBOX_OFFSET_Y = 15, 15
 
+# Enemy
+ENEMY_SIZE = ENEMY_X, ENEMY_Y = 40, 58
+ENEMY_HITBOX_SIZE = ENEMY_HITBOX_SIZE_X, ENEMY_HITBOX_SIZE_Y = 20, 25
+ENEMY_HITBOX_OFFSET = ENEMY_HITBOX_OFFSET_X, ENEMY_HITBOX_OFFSET_Y = 10, 25
+
 # ANIMATION
 ANIMATION_MS_PER_FRAME = 150
 
@@ -25,11 +30,15 @@ DASH_BAR_INNER_POS = DASH_BAR_POS[0] + 17, DASH_BAR_POS[1] + DASH_BAR_INNER_HEIG
 
 # ------------------------------------Gameplay------------------------------------#
 # PLAYER
-PLAYER_SPEED = 0.2
+PLAYER_SPEED = 0.3
 DASH_POWER = 10
 DASH_FRICTION = 0.99
 DASH_COOLDOWN = 4000
 PLAYER_MAX_HEALTH = 100
+DAMAGE_COOLDOWN = 500
+
+# ENEMY
+ENEMY_SPEED = 0 #0.1
 
 # ------------------------------------Project-------------------------------------#
 # LEVEL
@@ -37,9 +46,16 @@ LEVEL_PATH = "data/levels/{level_id}/{level_id}_{layer_type}.csv"
 ASSETS_PATH_WALL_BASIC = "assets/wall/basic/"
 ASSETS_PATH_WALL_DECO = "assets/wall/deco/"
 ASSETS_PATH_FLOOR = "assets/floor/"
+
+# PLAYER
 ASSETS_PATH_PLAYER = "assets/characters/angel/"
+
+# ENEMY
+ASSETS_PATH_ENEMY = "assets/characters/wogol/"
+
+# UI
 ASSETS_PATH_UI = "assets/gui/"
 
 # ------------------------------------Debug---------------------------------------#
 # DEBUG
-DEBUG = False
+DEBUG = True

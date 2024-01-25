@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 from code.settings import PLAYER_SIZE, PLAYER_SPEED, WINDOW_X, WINDOW_Y, PLAYER_HITBOX_SIZE, PLAYER_HITBOX_OFFSET_X, \
     PLAYER_HITBOX_OFFSET_Y, DASH_FRICTION, DASH_POWER, DASH_COOLDOWN, ANIMATION_MS_PER_FRAME, ASSETS_PATH_PLAYER, \
-    PLAYER_MAX_HEALTH
+    PLAYER_MAX_HEALTH, DAMAGE_COOLDOWN
 from enum import Enum
 
 
@@ -39,8 +39,10 @@ class Player(pg.sprite.Sprite):
         self.dash_cooldown_ms = 0
         self.pos = pg.Vector2(pos)
 
-        # data
+        # health
         self.health = PLAYER_MAX_HEALTH
+        self.damage_cooldown = 0
+
 
     def _load_textures(self):
         self.textures = {
@@ -81,15 +83,19 @@ class Player(pg.sprite.Sprite):
 
         self.velocity.x = 0
         if keys[pg.K_a]:
-            self.velocity.x += -PLAYER_SPEED * dt
+            self.velocity.x += -1
         if keys[pg.K_d]:
-            self.velocity.x += PLAYER_SPEED * dt
+            self.velocity.x += 1
 
         self.velocity.y = 0
         if keys[pg.K_w]:
-            self.velocity.y += -PLAYER_SPEED * dt
+            self.velocity.y += -1
         if keys[pg.K_s]:
-            self.velocity.y += PLAYER_SPEED * dt
+            self.velocity.y += 1
+        
+        if self.velocity.magnitude() != 0:
+            self.velocity = self.velocity.normalize()
+            self.velocity *= PLAYER_SPEED * dt
 
     def _update_input_mouse(self, events):
         for event in events:
@@ -115,6 +121,16 @@ class Player(pg.sprite.Sprite):
     def reset_collide_rect_pos(self):
         self.collide_rect.x = self.rect.x + PLAYER_HITBOX_OFFSET_X
         self.collide_rect.y = self.rect.y + PLAYER_HITBOX_OFFSET_Y
+
+    def update_enemy_collision(self, enemies: pg.sprite.Group, dt: int):
+        if self.damage_cooldown <= 0:
+            for e in enemies:
+                if e.collide_rect.colliderect(self.collide_rect):
+                    print(f"took damage from {id(e)}")
+                    self.damage_cooldown = DAMAGE_COOLDOWN
+                    self.health -= e.damage_value
+        else:
+            self.damage_cooldown -= dt
 
     def update(self, window: Window):
         self._update_input_key(window.deltatime)

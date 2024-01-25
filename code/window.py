@@ -25,7 +25,7 @@ class Window:
     """
 
     def __init__(self, width=WINDOW_X, height=WINDOW_Y, showfps=False) -> None:
-        self.display = pg.display.set_mode((width, height))
+        self.display = pg.display.set_mode((width, height), pg.NOFRAME)
         pg.display.set_caption("")
 
         self._clock = pg.time.Clock()
@@ -66,7 +66,7 @@ class Window:
 
     def has_quit(self) -> bool:
         for e in self.events:
-            if e.type == pg.QUIT:
+            if e.type == pg.QUIT or e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
                 pg.quit()
                 return True
         return False

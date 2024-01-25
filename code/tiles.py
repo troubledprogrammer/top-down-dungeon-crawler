@@ -10,7 +10,7 @@ class Tile(pg.sprite.Sprite):
         super().__init__()
 
         self.image = image
-        self.rect = self.image.get_rect(bottomleft=pos)
+        self.rect = self.image.get_rect(topleft=pos)
         self.pos_on_map = pg.Vector2(pos)
 
         self.tile_info = tile_info

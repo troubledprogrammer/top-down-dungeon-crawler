@@ -2,11 +2,13 @@ from enum import Enum
 
 from code.settings import TILE_X, TILE_Y
 from code.player import Player
+from code.enemies import Enemy
 
 
 class EntityType(Enum):
     NULL = -1
     PLAYER = 0
+    ENEMY = 1
 
 
 class EntityFactory:
@@ -16,3 +18,5 @@ class EntityFactory:
         match entity_type:
             case EntityType.PLAYER:
                 return Player(pos)
+            case EntityType.ENEMY:
+                return Enemy(pos)

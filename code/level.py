@@ -32,6 +32,7 @@ class Level:
 
         # entities
         self.player = pg.sprite.GroupSingle()
+        self.enemies = pg.sprite.Group()
         self._setup_entities(Path(LEVEL_PATH.format(level_id=0, layer_type="info")))
 
         # ui
@@ -76,6 +77,8 @@ class Level:
                 e = EntityFactory.create_entity(entity_type, ci, ri)
                 if entity_type == EntityType.PLAYER:
                     self.player.add(e)
+                if entity_type == EntityType.ENEMY:
+                    self.enemies.add(e)
 
     def _center_player(self):
         player = self.player.sprite
@@ -84,9 +87,9 @@ class Level:
         self.world_shift.x, self.world_shift.y = window_center_x - player_x, window_center_y - player_y
 
     def _run_tile_collisions_x(self, player: Player):
-        collidable_players = self.walls_collidable.sprites()  # + ...
+        collidable_sprites = self.walls_collidable.sprites()  # + ...
 
-        for s in collidable_players:
+        for s in collidable_sprites:
             if s.rect.colliderect(player.collide_rect):
                 # x
                 if player.velocity.x < 0 and s.rect.left <= player.collide_rect.left <= s.rect.right:
@@ -97,9 +100,9 @@ class Level:
                     print(f"Player clipped inside {s} ({s.rect=})")
 
     def _run_tile_collisions_y(self, player: Player):
-        collidable_players = self.walls_collidable.sprites()  # + ...
+        collidable_sprites = self.walls_collidable.sprites()  # + ...
 
-        for s in collidable_players:
+        for s in collidable_sprites:
             if s.rect.colliderect(player.collide_rect):
                 # y
                 if player.velocity.y < 0 and s.rect.top <= player.collide_rect.top <= s.rect.bottom:
@@ -129,22 +132,30 @@ class Level:
         self.floor.update(self.world_shift)
         self.walls_collidable.update(self.world_shift)
         self.walls_non_collidable.update(self.world_shift)
+        self.enemies.update(self.world_shift, self.window)
 
     def _update_player(self):
+        # movement
         self.player.update(self.window)
         self._move_player_x()
         self._move_player_y()
         self.player.sprite.reset_collide_rect_pos()
 
+        # enemy collision
+        self.player.sprite.update_enemy_collision(self.enemies, self.window.deltatime)
+
     def _draw(self):
         self.floor.draw(self.window.display)
+        self.enemies.draw(self.window.display)
         self.player.draw(self.window.display)
         self.walls_collidable.draw(self.window.display)
         self.walls_non_collidable.draw(self.window.display)
         self.ui.draw(self.window.display)
 
         if DEBUG:
-            pg.draw.rect(self.window.display, "red", self.player.sprite.collide_rect, 2)
+            pg.draw.rect(self.window.display, "green", self.player.sprite.collide_rect, 2)
+            for e in self.enemies.sprites():
+                pg.draw.rect(self.window.display, "red", e.collide_rect, 1)
 
     def tick(self):
         self._update_player()
