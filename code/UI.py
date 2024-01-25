@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 from code.settings import *
 
 
-# MAYBE REFACTOR THIS INTO OWN FILE AS CAN BE USED BY OTHER SPRITES
+# TODO: MAYBE REFACTOR THIS INTO OWN FILE AS CAN BE USED BY OTHER SPRITES
 def _load_and_scale(filepath: str, height: int):
     img = pg.image.load(filepath)
     ar = img.get_width() / img.get_height()
