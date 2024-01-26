@@ -5,6 +5,7 @@ from typing import Tuple, TYPE_CHECKING
 from enum import Enum
 if TYPE_CHECKING:
     from code.window import Window
+    from code.entities import EntityType
 
 from code.settings import ASSETS_PATH_ENEMY, ENEMY_SIZE, ENEMY_SPEED, ENEMY_HITBOX_OFFSET_X, \
     ENEMY_HITBOX_OFFSET_Y, ENEMY_HITBOX_SIZE, ANIMATION_MS_PER_FRAME
@@ -14,9 +15,10 @@ class EnemyState(Enum):
     Run = 1,
 
 class Enemy(pg.sprite.Sprite):
-    def __init__(self, pos: Tuple[int, int] | pg.Vector2):
+    def __init__(self, pos: Tuple[int, int] | pg.Vector2, entity_type: EntityType.ENEMY):
         # super
         super().__init__()
+        self.entity_type = entity_type
 
         # visual
         self.textures = {}
@@ -25,13 +27,14 @@ class Enemy(pg.sprite.Sprite):
         self.animation_time_ms = 0
 
         # collisions
-        self.rect = self.image.get_rect(topleft=pos)
+        self.rect = self.image.get_rect()
         self.collide_rect = pg.Rect(*pos, *ENEMY_HITBOX_SIZE)
-        self.reset_collide_rect_pos()
+        self.hitbox = pg.Surface(self.collide_rect.size, pg.SRCALPHA)
+        pg.draw.rect(self.hitbox, "red", pg.Rect(0, 0, *ENEMY_HITBOX_SIZE), 1)
+        self.reset_rect_pos()
 
         # movement
         self.velocity = pg.Vector2(ENEMY_SPEED, ENEMY_SPEED)
-        self.pos_on_map = pg.Vector2(pos)
 
         # damage
         self.damage_value = 5
@@ -67,14 +70,13 @@ class Enemy(pg.sprite.Sprite):
         self.image = self.textures[state][animation_frame]
 
     def _update_movement(self, dt: int):
-        self.pos_on_map += self.velocity * dt
+        self.collide_rect.topleft += self.velocity * dt
     
-    def reset_collide_rect_pos(self):
-        self.collide_rect.x = self.rect.x + ENEMY_HITBOX_OFFSET_X
-        self.collide_rect.y = self.rect.y + ENEMY_HITBOX_OFFSET_Y
+    def reset_rect_pos(self):
+        self.rect.x = self.collide_rect.x - ENEMY_HITBOX_OFFSET_X
+        self.rect.y = self.collide_rect.y - ENEMY_HITBOX_OFFSET_Y
 
-    def update(self, shift: pg.Vector2, window: Window) -> None:
+    def update(self, window: Window) -> None:
         self._update_movement(window.deltatime)
-        self.rect.topleft = self.pos_on_map + shift
-        self.reset_collide_rect_pos()
+        self.reset_rect_pos()
         self._animate(window.deltatime)

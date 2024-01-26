@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 import pygame as pg
+from enum import Enum
 from typing import Tuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from code.window import Window
+    from code.entities import EntityType
 
-from code.settings import PLAYER_SIZE, PLAYER_SPEED, WINDOW_X, WINDOW_Y, PLAYER_HITBOX_SIZE, PLAYER_HITBOX_OFFSET_X, \
+from code.settings import PLAYER_SIZE, PLAYER_SPEED, PLAYER_HITBOX_SIZE, PLAYER_HITBOX_OFFSET_X, \
     PLAYER_HITBOX_OFFSET_Y, DASH_FRICTION, DASH_POWER, DASH_COOLDOWN, ANIMATION_MS_PER_FRAME, ASSETS_PATH_PLAYER, \
     PLAYER_MAX_HEALTH, DAMAGE_COOLDOWN
-from enum import Enum
-
 
 class PlayerState(Enum):
     Idle = 0,
@@ -18,9 +18,10 @@ class PlayerState(Enum):
 
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, pos: Tuple[int, int] | pg.Vector2):
+    def __init__(self, pos: Tuple[int, int] | pg.Vector2, entity_type: EntityType.PLAYER):
         # super
         super().__init__()
+        self.entity_type = entity_type
 
         # visual
         self.textures = {}
@@ -29,15 +30,16 @@ class Player(pg.sprite.Sprite):
         self.animation_time_ms = 0
 
         # collisions
-        self.rect = self.image.get_rect(center=(WINDOW_X // 2, WINDOW_Y // 2))
-        self.collide_rect = pg.Rect(0, 0, *PLAYER_HITBOX_SIZE)
-        self.reset_collide_rect_pos()
+        self.rect = self.image.get_rect()
+        self.collide_rect = pg.Rect(*pos, *PLAYER_HITBOX_SIZE)
+        self.hitbox = pg.Surface(self.collide_rect.size, pg.SRCALPHA)
+        pg.draw.rect(self.hitbox, "green", pg.Rect(0, 0, *PLAYER_HITBOX_SIZE), 2)
+        self.reset_rect_pos()
 
         # movement
         self.velocity = pg.Vector2()
         self.dash_vector = pg.Vector2()
         self.dash_cooldown_ms = 0
-        self.pos = pg.Vector2(pos)
 
         # health
         self.health = PLAYER_MAX_HEALTH
@@ -118,15 +120,14 @@ class Player(pg.sprite.Sprite):
             if self.dash_cooldown_ms < 0:
                 self.dash_cooldown_ms = 0
 
-    def reset_collide_rect_pos(self):
-        self.collide_rect.x = self.rect.x + PLAYER_HITBOX_OFFSET_X
-        self.collide_rect.y = self.rect.y + PLAYER_HITBOX_OFFSET_Y
+    def reset_rect_pos(self):
+        self.rect.x = self.collide_rect.x - PLAYER_HITBOX_OFFSET_X
+        self.rect.y = self.collide_rect.y - PLAYER_HITBOX_OFFSET_Y
 
     def update_enemy_collision(self, enemies: pg.sprite.Group, dt: int):
         if self.damage_cooldown <= 0:
             for e in enemies:
                 if e.collide_rect.colliderect(self.collide_rect):
-                    print(f"took damage from {id(e)}")
                     self.damage_cooldown = DAMAGE_COOLDOWN
                     self.health -= e.damage_value
         else:

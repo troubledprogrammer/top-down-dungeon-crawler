@@ -1,7 +1,7 @@
 import pygame as pg
 from typing import Tuple
 
-from code.settings import TILE_X, TILE_Y, DEBUG
+from code.settings import TILE_X, TILE_Y
 from code.tiletypes import *
 
 
@@ -9,17 +9,17 @@ class Tile(pg.sprite.Sprite):
     def __init__(self, image: pg.Surface, pos: Tuple[int, int] | pg.Vector2, tile_info: TileInfo) -> None:
         super().__init__()
 
-        self.image = image
-        self.rect = self.image.get_rect(topleft=pos)
-        self.pos_on_map = pg.Vector2(pos)
-
         self.tile_info = tile_info
 
-        if DEBUG and self.tile_info.collidable:
-            pg.draw.rect(self.image, "blue", pg.Rect(0, 0, *self.rect.size), 1)
+        self.image = image
+        self.rect = self.image.get_rect(topleft=pos)
+        self.collide_rect = self.image.get_rect(topleft = pos)
+        self.hitbox = pg.Surface(self.collide_rect.size, pg.SRCALPHA)
+        colour = "blue" if self.tile_info.collidable else pg.Color(0, 0, 0, 0)
+        pg.draw.rect(self.hitbox, colour, pg.Rect(0, 0, TILE_X, TILE_Y), 1)
 
-    def update(self, shift: pg.Vector2) -> None:
-        self.rect.topleft = self.pos_on_map + shift
+    def update(self) -> None:
+        pass
 
 
 class StaticTile(Tile):
