@@ -17,6 +17,6 @@ class EntityFactory:
         pos = xind*TILE_X + TILE_X // 2, yind*TILE_Y + TILE_Y//2
         match entity_type:
             case EntityType.PLAYER:
-                return Player(pos, EntityType.PLAYER)
+                return Player(pos, entity_type)
             case EntityType.ENEMY:
-                return Enemy(pos, EntityType.ENEMY)
+                return Enemy(pos, entity_type)

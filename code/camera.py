@@ -10,16 +10,16 @@ class Camera:
     
     def render_sprites(self, sprites: pg.sprite.Group | pg.sprite.GroupSingle):
         for s in sprites:
-            pos = pg.Rect(s.rect.left + self.world_shift.x,
-                          s.rect.top + self.world_shift.y,
-                          s.rect.width,
-                          s.rect.height)
+            pos = pg.Rect(
+                *self.world_to_screen_pos(s.rect.topleft),
+                s.rect.width,
+                s.rect.height
+            )
             self.window.display.blit(s.image, pos)
 
             if DEBUG:
                 hitbox_pos = pg.Rect(
-                    s.collide_rect.left + self.world_shift.x,
-                    s.collide_rect.top + self.world_shift.y,
+                    *self.world_to_screen_pos(s.collide_rect.topleft),
                     s.collide_rect.width,
                     s.collide_rect.height
                 )
@@ -28,3 +28,9 @@ class Camera:
     def center_at_point(self, point: Tuple[int, int]):
         self.world_shift.x = -point[0] + WINDOW_X // 2
         self.world_shift.y = -point[1] + WINDOW_Y // 2
+
+    def world_to_screen_pos(self, point: Tuple[int, int] | pg.Vector2) -> Tuple[int, int]:
+        return point[0] + self.world_shift.x, point[1] + self.world_shift.y
+
+    def screen_to_world_pos(self, point: Tuple[int, int]) -> Tuple[int, int]:
+        return point[0] - self.world_shift.x, point[1] - self.world_shift.y

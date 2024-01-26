@@ -5,6 +5,7 @@ from enum import Enum
 from typing import Tuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from code.window import Window
+    from code.camera import Camera
     from code.entities import EntityType
 
 from code.settings import PLAYER_SIZE, PLAYER_SPEED, PLAYER_HITBOX_SIZE, PLAYER_HITBOX_OFFSET_X, \
@@ -99,11 +100,11 @@ class Player(pg.sprite.Sprite):
             self.velocity = self.velocity.normalize()
             self.velocity *= PLAYER_SPEED * dt
 
-    def _update_input_mouse(self, events):
+    def _update_input_mouse(self, events, camera: Camera):
         for event in events:
             if event.type == pg.MOUSEBUTTONUP and event.button == 1 and self.dash_cooldown_ms == 0:
-                mouse_pos = pg.Vector2(pg.mouse.get_pos())
-                self.dash_vector = (mouse_pos - pg.Vector2(self.rect.center)).normalize() * DASH_POWER
+                mouse_world_pos = camera.screen_to_world_pos(pg.Vector2(pg.mouse.get_pos()))
+                self.dash_vector = (mouse_world_pos - pg.Vector2(self.collide_rect.center)).normalize() * DASH_POWER
                 self.dash_cooldown_ms = DASH_COOLDOWN
 
     def _update_dash_friction(self, dt):
@@ -133,8 +134,8 @@ class Player(pg.sprite.Sprite):
         else:
             self.damage_cooldown -= dt
 
-    def update(self, window: Window):
+    def update(self, window: Window, camera: Camera):
         self._update_input_key(window.deltatime)
-        self._update_input_mouse(window.events)
+        self._update_input_mouse(window.events, camera)
         self._update_dash_friction(window.deltatime)
         self._animate(window.deltatime)

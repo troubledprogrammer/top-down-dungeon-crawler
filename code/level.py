@@ -118,7 +118,7 @@ class Level:
 
     def _update_player(self):
         # movement
-        self.player.update(self.window)
+        self.player.update(self.window, self.camera)
         self._move_player_x()
         self._move_player_y()
         self.player.sprite.reset_rect_pos()
