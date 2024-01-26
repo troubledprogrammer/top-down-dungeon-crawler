@@ -3,6 +3,7 @@ from __future__ import annotations
 import pygame as pg
 from enum import Enum
 from typing import Tuple, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from code.window import Window
     from code.camera import Camera
@@ -11,6 +12,7 @@ if TYPE_CHECKING:
 from code.settings import PLAYER_SIZE, PLAYER_SPEED, PLAYER_HITBOX_SIZE, PLAYER_HITBOX_OFFSET_X, \
     PLAYER_HITBOX_OFFSET_Y, DASH_FRICTION, DASH_POWER, DASH_COOLDOWN, ANIMATION_MS_PER_FRAME, ASSETS_PATH_PLAYER, \
     PLAYER_MAX_HEALTH, DAMAGE_COOLDOWN
+
 
 class PlayerState(Enum):
     Idle = 0,
@@ -45,7 +47,6 @@ class Player(pg.sprite.Sprite):
         # health
         self.health = PLAYER_MAX_HEALTH
         self.damage_cooldown = 0
-
 
     def _load_textures(self):
         self.textures = {
@@ -95,7 +96,7 @@ class Player(pg.sprite.Sprite):
             self.velocity.y += -1
         if keys[pg.K_s]:
             self.velocity.y += 1
-        
+
         if self.velocity.magnitude() != 0:
             self.velocity = self.velocity.normalize()
             self.velocity *= PLAYER_SPEED * dt
@@ -103,7 +104,7 @@ class Player(pg.sprite.Sprite):
     def _update_input_mouse(self, events, camera: Camera):
         for event in events:
             if event.type == pg.MOUSEBUTTONUP and event.button == 1 and self.dash_cooldown_ms == 0:
-                mouse_world_pos = camera.screen_to_world_pos(pg.Vector2(pg.mouse.get_pos()))
+                mouse_world_pos = camera.screen_to_world_pos(pg.mouse.get_pos())
                 self.dash_vector = (mouse_world_pos - pg.Vector2(self.collide_rect.center)).normalize() * DASH_POWER
                 self.dash_cooldown_ms = DASH_COOLDOWN
 

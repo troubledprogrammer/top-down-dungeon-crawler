@@ -15,11 +15,12 @@ def load_csv(fp):
         level = [[int(n) for n in line.split(",")] for line in f.readlines()]
     return level
 
+
 class Level:
     def __init__(self, level_id: int, window: Window):
         # display
         self.window = window
-        self.camera = Camera(window)
+        self.camera = Camera(self.window.display)
 
         # level
         self.level_id = level_id

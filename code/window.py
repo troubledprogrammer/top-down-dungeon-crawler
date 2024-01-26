@@ -31,7 +31,7 @@ class Window:
         self._clock = pg.time.Clock()
 
         self.deltatime = 1
-        self.fps = 60
+        self.fps = 240
 
         self.events = []
 
@@ -56,7 +56,7 @@ class Window:
         pg.display.update()
         self.display.fill("#222222")
 
-        self.deltatime = self._clock.tick(240)
+        self.deltatime = self._clock.tick(self.fps)
         try:
             self.fps = int(1000 / self.deltatime)
         except ZeroDivisionError:

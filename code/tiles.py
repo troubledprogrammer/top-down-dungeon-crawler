@@ -13,7 +13,7 @@ class Tile(pg.sprite.Sprite):
 
         self.image = image
         self.rect = self.image.get_rect(topleft=pos)
-        self.collide_rect = self.image.get_rect(topleft = pos)
+        self.collide_rect = self.image.get_rect(topleft=pos)
         self.hitbox = pg.Surface(self.collide_rect.size, pg.SRCALPHA)
         colour = "blue" if self.tile_info.collidable else pg.Color(0, 0, 0, 0)
         pg.draw.rect(self.hitbox, colour, pg.Rect(0, 0, TILE_X, TILE_Y), 1)
@@ -27,10 +27,10 @@ class StaticTile(Tile):
         img = pg.image.load(TileTexturePaths[tile_info.tile_type] + tile_info.texture_name + ".png")
         x, y = img.get_size()
         ratio = y / x
-        img = pg.transform.scale(img, (TILE_X, TILE_Y*ratio))
+        img = pg.transform.scale(img, (TILE_X, TILE_Y * ratio))
         if ratio != 1.0:
             x, y = pos
-            pos = x, y - TILE_Y*(ratio-1)
+            pos = x, y - TILE_Y * (ratio - 1)
 
         super().__init__(img, pos, tile_info)
 

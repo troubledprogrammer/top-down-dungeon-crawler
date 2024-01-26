@@ -3,6 +3,7 @@ from __future__ import annotations
 import pygame as pg
 from typing import Tuple, TYPE_CHECKING
 from enum import Enum
+
 if TYPE_CHECKING:
     from code.window import Window
     from code.entities import EntityType
@@ -10,9 +11,11 @@ if TYPE_CHECKING:
 from code.settings import ASSETS_PATH_ENEMY, ENEMY_SIZE, ENEMY_SPEED, ENEMY_HITBOX_OFFSET_X, \
     ENEMY_HITBOX_OFFSET_Y, ENEMY_HITBOX_SIZE, ANIMATION_MS_PER_FRAME
 
+
 class EnemyState(Enum):
     Idle = 0,
     Run = 1,
+
 
 class Enemy(pg.sprite.Sprite):
     def __init__(self, pos: Tuple[int, int] | pg.Vector2, entity_type: EntityType.ENEMY):
@@ -54,7 +57,7 @@ class Enemy(pg.sprite.Sprite):
                 pg.transform.scale(pg.image.load(ASSETS_PATH_ENEMY + "wogol_run_anim_f3.png"), ENEMY_SIZE),
             ],
         }
-    
+
     def _get_state(self):
         if self.velocity.magnitude() > 0:
             return EnemyState.Run
@@ -71,7 +74,7 @@ class Enemy(pg.sprite.Sprite):
 
     def _update_movement(self, dt: int):
         self.collide_rect.topleft += self.velocity * dt
-    
+
     def reset_rect_pos(self):
         self.rect.x = self.collide_rect.x - ENEMY_HITBOX_OFFSET_X
         self.rect.y = self.collide_rect.y - ENEMY_HITBOX_OFFSET_Y
